@@ -1,3 +1,5 @@
+import router from '@/router'
+import Cookie from 'js-cookie'
 export default{
     state:{
         isCollapse:false,
@@ -9,7 +11,8 @@ export default{
                 icon:'home'
             }
         ],
-        currentMenu: null
+        currentMenu: null,
+        menu:[]
     },
     mutations:{
         collapseMenu(state){
@@ -29,6 +32,38 @@ export default{
         closeTag(state, val){
             const result = state.tabsList.findIndex(item => item.name === val.name)
             state.tabsList.splice(result,1)
+        },
+        setMenu(state,val){
+            state.menu = val
+            Cookie.set('menu', JSON.stringify(val))
+        },
+        clearMenu(state){
+            state.menu = []
+            Cookie.remove('menu')
+        },
+        addMenu(state){
+            if(!Cookie.get('menu')){
+                return
+            }
+            const menu = JSON.parse(Cookie.get('menu'))
+            state.menu = menu
+            const menuArr = []
+            menu.forEach(item => {
+                if(item.children){
+                    item.children = item.children.map(item => {
+                        item.component = () => import(`../pages/${item.url}`)
+                        return item
+                    })
+                    menuArr.push(...item.children)
+                }else{
+                    item.component = () => import(`../pages/${item.url}`)
+                    menuArr.push(item)
+                }
+            });
+            // 路由的动态添加
+            menuArr.forEach(item => {
+                router.addRoutes('Main',item)
+            })
         }
     }
 }

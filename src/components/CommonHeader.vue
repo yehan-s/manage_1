@@ -10,7 +10,12 @@
       ></el-button>
       <!-- <h3 style="color: #fff">首页</h3> -->
       <el-breadcrumb separator="/">
-        <el-breadcrumb-item v-for="item in tags" :key="item.path" :to="{ path: item.path }">{{item.label}}</el-breadcrumb-item>
+        <el-breadcrumb-item
+          v-for="item in tags"
+          :key="item.path"
+          :to="{ path: item.path }"
+          >{{ item.label }}</el-breadcrumb-item
+        >
       </el-breadcrumb>
     </div>
     <!-- 导航右侧 -->
@@ -21,7 +26,7 @@
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item>个人中心</el-dropdown-item>
-          <el-dropdown-item>退出</el-dropdown-item>
+          <el-dropdown-item @click.native="logOut">退出</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -29,7 +34,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import { mapState } from "vuex";
 export default {
   name: "CommonHeader",
   data() {
@@ -41,12 +46,17 @@ export default {
     handleMenu() {
       this.$store.commit("collapseMenu");
     },
+    logOut() {
+      this.$store.commit("clearToken");
+      this.$store.commit("clearMenu");
+      this.$router.push("/login");
+    },
   },
-  computed:{
+  computed: {
     ...mapState({
-      tags: state => state.tab.tabsList
-    })
-  }
+      tags: (state) => state.tab.tabsList,
+    }),
+  },
 };
 </script>
 
